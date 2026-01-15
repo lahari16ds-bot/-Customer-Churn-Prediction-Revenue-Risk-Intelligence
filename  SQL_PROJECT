@@ -1,0 +1,16 @@
+-- Find customers who are likely inactive or at risk of churn
+
+SELECT
+    c.customer_id,
+    c.customer_name,
+    MAX(o.order_date) AS last_purchase_date,
+    COUNT(o.order_id) AS total_orders,
+    SUM(o.order_amount) AS lifetime_value,
+    CURRENT_DATE - MAX(o.order_date) AS days_since_last_purchase
+FROM customers c
+LEFT JOIN orders o
+    ON c.customer_id = o.customer_id
+GROUP BY c.customer_id, c.customer_name
+HAVING
+    CURRENT_DATE - MAX(o.order_date) > 90
+ORDER BY days_since_last_purchase DESC;
